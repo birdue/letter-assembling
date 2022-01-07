@@ -12,13 +12,20 @@ function getRandomWord() {
 	return words[randomInt(words.length)];
 }
 async function preload() {
-	words = (await readFile("./1000.txt")).toString().split(/\r?\n/).filter(w => w.length >= wordMinLength);
+	const englishWord = /^[A-Za-z]+$/;
+	words = (await readFile("./1000.txt")).toString()
+		.split(/\r?\n/) // Convert to an array of words
+		.filter(w => englishWord.exec(w)) // Filter out non-English words and words like "don't" etc
+		.filter(w => w.length >= wordMinLength) // Filter length
+		.map(w => w.toUpperCase());
 }
 
 async function generate() {
 	let puzzle = "";
 	while(puzzle.length < puzzleMinLength) {
-		puzzle += getRandomWord();
+		const word = getRandomWord();
+		// console.log(word);
+		puzzle += word;
 	}
 	puzzle = puzzle.split('').sort((c1, c2) => c1.charCodeAt(0) - c2.charCodeAt(0)).join('');
 	return puzzle;
